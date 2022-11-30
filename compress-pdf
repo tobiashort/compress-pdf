@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+check_command_exists() {
+    command -v "$1" >/dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        echo "I require $1 but it's not installed. Abort."
+        exit 1
+    fi
+}
+
+print_usage_and_exit() {
+    echo "Usage: compress-pdf FILE"
+    exit 1
+}
+
+check_command_exists "gs"
+
+if ! [ "$#" -eq "1" ]; then
+   print_usage_and_exit 
+fi
+
+# -dPDFSETTINGS=/screen   — Low quality and small size at 72dpi.
+# -dPDFSETTINGS=/ebook    — Slightly better quality but also a larger file size at 150dpi.
+# -dPDFSETTINGS=/prepress — High quality and large size at 300 dpi.
+# -dPDFSETTINGS=/default  — System chooses the best output, which can create larger PDF files.
+
+gs \
+    -sDEVICE=pdfwrite \
+    -dCompatibilityLevel=1.4 \
+    -dPDFSETTINGS=/screen \
+    -dNOPAUSE \
+    -dQUIET \
+    -dBATCH \
+    -sOutputFile="${1%.pdf}_compressed.pdf" \
+    "$1"
