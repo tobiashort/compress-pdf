@@ -1,0 +1,3 @@
+```
+./compress-pdf FILE
+```
